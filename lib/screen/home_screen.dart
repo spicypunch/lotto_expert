@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:lotto_expert/common/const/colors.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -24,6 +25,10 @@ class HomeScreen extends StatelessWidget {
                 print(response.data);
               },
               child: Text('Button'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: BUTTON_COLOR,
+                foregroundColor: PRIMARY_BLACK,
+              ),
             ),
           ],
         ),
