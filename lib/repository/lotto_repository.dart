@@ -1,9 +1,16 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotto_expert/common/dio/dio.dart';
+import 'package:lotto_expert/model/lotto_model.dart';
 import 'package:retrofit/http.dart';
 
-import '../model/lotto_model.dart';
-
 part 'lotto_repository.g.dart';
+
+
+final lottoRepositoryProvider = Provider((ref) {
+  final dio = ref.watch(dioProvider);
+  return LottoRepository(dio, baseUrl: "http://www.dhlottery.co.kr/common.do");
+}) ;
 
 @RestApi()
 abstract class LottoRepository {

@@ -1,4 +1,38 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final dioProvider = Provider((ref) {
+  final dio = Dio();
+
+  // dio.interceptors.add(
+  //   InterceptorsWrapper(
+  //     onRequest: (options, handler) {
+  //       // Request 인터셉터 로직
+  //       print('onRequest');
+  //       return handler.next(options);
+  //     },
+  //     onResponse: (response, handler) {
+  //       // Response 인터셉터 로직 (이전에 작성한 코드)
+  //       if (response.data is String) {
+  //         print('onResponse');
+  //         response.data = jsonDecode(response.data);
+  //       }
+  //       return handler.next(response);
+  //     },
+  //     onError: (DioError e, handler) {
+  //       // Error 인터셉터 로직
+  //       print('onError');
+  //       return handler.next(e);
+  //     },
+  //   ),
+  // );
+
+  dio.interceptors.add;
+
+  return dio;
+});
 
 class CustomInterceptor extends Interceptor {
   @override

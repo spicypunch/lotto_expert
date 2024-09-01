@@ -36,6 +36,8 @@ class LottoModel {
 
   factory LottoModel.fromJson(Map<String, dynamic> json) =>
       _$LottoModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$LottoModelToJson(this);
 }
 
 /**
