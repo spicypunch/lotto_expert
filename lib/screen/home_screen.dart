@@ -66,20 +66,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   if (startNo <= endNo) {
                     ref.read(lottoNumberProvider.notifier).getLottoNumber(
-                        startNo: startNo, endNo: endNo);
-                    state.when(
-                      data: (lottoNumbers) => showDialog(context: context, builder: (BuildContext context) {
-                        return Dialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                            child: Text(lottoNumbers.toString())
+                          startNo: startNo,
+                          endNo: endNo,
                         );
-                      }),
+                    state.when(
+                      data: (lottoNumbers) => showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16.0),
+                                ),
+                                child: Text(lottoNumbers.list.toString()));
+                          }),
                       error: (err, stack) => Text('$err'),
-                      loading: () =>
-                      const Center(
-                        child: CircularProgressIndicator(),),);
+                      loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
