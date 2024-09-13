@@ -24,6 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(lottoNumberProvider);
+
     return Scaffold(
       body: Center(
         child: Padding(
@@ -66,23 +67,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   if (startNo <= endNo) {
                     ref.read(lottoNumberProvider.notifier).getLottoNumber(
-                          startNo: startNo,
-                          endNo: endNo,
-                        );
-                    state.when(
-                      data: (lottoNumbers) => showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
-                                child: Text(lottoNumbers.list.toString()));
-                          }),
-                      error: (err, stack) => Text('$err'),
-                      loading: () => const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      startNo: startNo,
+                      endNo: endNo,
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -100,6 +86,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(
                 height: 16.0,
+              ),
+              state.when(
+                data: (lottoState) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (lottoState.frequencyNumberMap != null &&
+                        lottoState.frequencyNumberMap!.isNotEmpty) {
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return Dialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '${lottoState.dialogTitle}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemCount: lottoState.sortedNumbers?.length,
+                                      itemBuilder: (context, index) {
+                                        final number = lottoState.sortedNumbers?[index];
+                                        final frequency = lottoState.frequencyNumberMap![number];
+                                        return ListTile(
+                                          title: Text('번호: $number'),
+                                          subtitle: Text('당첨 횟수: $frequency'),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // 다이얼로그 닫기
+                                    },
+                                    child: const Text('정보 저장'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  });
+
+                  // UI에 별도의 내용은 표시하지 않음
+                  return const SizedBox.shrink();
+                },
+                error: (err, stack) => Text('Error: $err'),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(), // 로딩 중일 때 표시
+                ),
               ),
             ],
           ),

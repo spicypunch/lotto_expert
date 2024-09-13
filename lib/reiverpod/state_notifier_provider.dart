@@ -1,13 +1,18 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotto_expert/model/lotto_model.dart';
 import 'package:lotto_expert/repository/lotto_repository.dart';
 
 class LottoNumberState {
-  List<Map<String, dynamic>>? list;
+  Map<int, int>? frequencyNumberMap;
+  List<int>? sortedNumbers;
+  String? dialogTitle;
 
   LottoNumberState({
-    this.list,
+    this.frequencyNumberMap,
+    this.sortedNumbers,
+    this.dialogTitle,
   });
 }
 
@@ -22,7 +27,7 @@ class LottoNumberProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
 
   LottoNumberProvider({
     required this.lottoRepository,
-  }) : super(const AsyncValue.loading());
+  }) : super(AsyncValue.data(LottoNumberState()));
 
   Future<void> getLottoNumber({
     required int startNo,
@@ -30,17 +35,46 @@ class LottoNumberProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      List<Map<String, dynamic>> lottoNumbers = [];
+      Map<int, int> numberFrequency = {};
+      // List<int> allNumbers = [];
+
       for (int i = startNo; i <= endNo; i++) {
         final response = await lottoRepository.getLottoNumber(drwNo: i);
         final jsonData = jsonDecode(response);
-        lottoNumbers.add(jsonData);
+        final lottoModel = LottoModel.fromJson(jsonData);
+
+        // drwtNo1부터 drwtNo6까지 추출
+        final List<int> lottoNumbers = [
+          lottoModel.drwtNo1,
+          lottoModel.drwtNo2,
+          lottoModel.drwtNo3,
+          lottoModel.drwtNo4,
+          lottoModel.drwtNo5,
+          lottoModel.drwtNo6,
+        ];
+
+        // 번호를 리스트에 추가
+        // allNumbers.addAll(lottoNumbers);
+
+        // 각 번호의 등장 횟수를 계산
+        for (var number in lottoNumbers) {
+          numberFrequency[number] = (numberFrequency[number] ?? 0) + 1;
+        }
       }
-      // state = AsyncValue.data(LottoNumberState(list: lottoNumbers));
+
+      // 번호를 빈도 순으로 정렬
+      List<int> sortedNumbers = numberFrequency.keys.toList()
+        ..sort((a, b) => numberFrequency[b]!.compareTo(numberFrequency[a]!));
+
+      state = AsyncValue.data(
+        LottoNumberState(
+          frequencyNumberMap: numberFrequency,
+          sortedNumbers: sortedNumbers,
+          dialogTitle: '$startNo회차 ~ $endNo회차',
+        ),
+      );
     } catch (error, stackTrace) {
       state = AsyncValue.error(error, stackTrace: stackTrace);
     }
   }
-
-
 }
