@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotto_expert/common/const/colors.dart';
-import 'package:lotto_expert/reiverpod/state_notifier_provider.dart';
+
+import '../common/layout/default_dialog.dart';
+import '../riverpod/home_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,9 +25,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(lottoNumberProvider);
+    final state = ref.watch(homeProvider);
 
     return Scaffold(
+      backgroundColor: PRIMARY_COLOR,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -66,10 +69,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   final endNo = int.tryParse(_endNoController.text) ?? 0;
 
                   if (startNo <= endNo) {
-                    ref.read(lottoNumberProvider.notifier).getLottoNumber(
-                      startNo: startNo,
-                      endNo: endNo,
-                    );
+                    ref.read(homeProvider.notifier).getLottoNumber(
+                          startNo,
+                          endNo,
+                        );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -89,59 +92,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               state.when(
                 data: (lottoState) {
+                  print(lottoState.listLottoModel.toString());
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (lottoState.frequencyNumberMap != null &&
                         lottoState.frequencyNumberMap!.isNotEmpty) {
-
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return Dialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    '${lottoState.dialogTitle}',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Expanded(
-                                    child: ListView.builder(
-                                      itemCount: lottoState.sortedNumbers?.length,
-                                      itemBuilder: (context, index) {
-                                        final number = lottoState.sortedNumbers?[index];
-                                        final frequency = lottoState.frequencyNumberMap![number];
-                                        return ListTile(
-                                          title: Text('번호: $number'),
-                                          subtitle: Text('당첨 횟수: $frequency'),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop(); // 다이얼로그 닫기
-                                    },
-                                    child: const Text('정보 저장'),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          return DefaultDialog(
+                            title: lottoState.dialogTitle!,
+                            sortedNum: lottoState.sortedNumbers!,
+                            numMap: lottoState.frequencyNumberMap!,
+                            onTabButton: () {
+                              ref.read(homeProvider.notifier).saveLottoNumber(
+                                    lottoState.dialogTitle!,
+                                    lottoState.sortedNumbers!,
+                                    lottoState.frequencyNumberMap!,
+                                  );
+                            },
                           );
                         },
                       );
                     }
                   });
-
                   // UI에 별도의 내용은 표시하지 않음
                   return const SizedBox.shrink();
                 },
@@ -149,6 +122,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 loading: () => const Center(
                   child: CircularProgressIndicator(), // 로딩 중일 때 표시
                 ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(homeProvider.notifier).getAllLottoData();
+                },
+                child: const Text('정보 저장'),
               ),
             ],
           ),

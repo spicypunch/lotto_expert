@@ -2,37 +2,48 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotto_expert/model/lotto_model.dart';
+import 'package:lotto_expert/model/lotto_number_response.dart';
 import 'package:lotto_expert/repository/lotto_repository.dart';
+
+import '../repository/isar_repository.dart';
 
 class LottoNumberState {
   Map<int, int>? frequencyNumberMap;
   List<int>? sortedNumbers;
   String? dialogTitle;
+  List<LottoModel>? listLottoModel;
 
   LottoNumberState({
     this.frequencyNumberMap,
     this.sortedNumbers,
     this.dialogTitle,
+    this.listLottoModel,
   });
 }
 
-final lottoNumberProvider = AutoDisposeStateNotifierProvider<
-    LottoNumberProvider, AsyncValue<LottoNumberState>>((ref) {
+final homeProvider = AutoDisposeStateNotifierProvider<HomeProvider,
+    AsyncValue<LottoNumberState>>((ref) {
   final lottoRepository = ref.watch(lottoRepositoryProvider);
-  return LottoNumberProvider(lottoRepository: lottoRepository);
+  final isarRepository = ref.watch(isarRepositoryProvider);
+  return HomeProvider(
+    lottoRepository: lottoRepository,
+    isarRepository: isarRepository,
+  );
 });
 
-class LottoNumberProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
+class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
   final LottoRepository lottoRepository;
+  final IsarRepository isarRepository;
 
-  LottoNumberProvider({
+  HomeProvider({
     required this.lottoRepository,
+    required this.isarRepository,
   }) : super(AsyncValue.data(LottoNumberState()));
 
-  Future<void> getLottoNumber({
-    required int startNo,
-    required int endNo,
-  }) async {
+  Future<void> getLottoNumber(
+    int startNo,
+    int endNo,
+  ) async {
     state = const AsyncValue.loading();
     try {
       Map<int, int> numberFrequency = {};
@@ -41,7 +52,7 @@ class LottoNumberProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
       for (int i = startNo; i <= endNo; i++) {
         final response = await lottoRepository.getLottoNumber(drwNo: i);
         final jsonData = jsonDecode(response);
-        final lottoModel = LottoModel.fromJson(jsonData);
+        final lottoModel = LottoNumberResponse.fromJson(jsonData);
 
         // drwtNo1부터 drwtNo6까지 추출
         final List<int> lottoNumbers = [
@@ -74,7 +85,24 @@ class LottoNumberProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
         ),
       );
     } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace: stackTrace);
+      state = AsyncValue.error(error, stackTrace);
     }
+  }
+
+  Future<void> saveLottoNumber(
+    String title,
+    List<int> sortedNum,
+    Map<int, int> numMap,
+  ) async {
+    await isarRepository.saveLottoData(
+      title,
+      sortedNum,
+      numMap,
+    );
+  }
+
+  Future<void> getAllLottoData() async {
+    final allLottoData = await isarRepository.getAllLottoData();
+    state = AsyncValue.data(LottoNumberState(listLottoModel: allLottoData));
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../common/const/colors.dart';
-import '../common/layout/DefaultLayout.dart';
+import '../common/layout/default_layout.dart';
 import 'home_screen.dart';
 
 class RootScreen extends StatefulWidget {
@@ -41,6 +41,7 @@ class _RootScreenState extends State<RootScreen>
     return DefaultLayout(
       title: '로또 당첨 번호 통계',
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: PRIMARY_COLOR,
         selectedItemColor: PRIMARY_BLACK,
         unselectedItemColor: SECONDARY_COLOR,
         selectedFontSize: 10,
@@ -62,7 +63,7 @@ class _RootScreenState extends State<RootScreen>
         ],
       ),
       child: TabBarView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: controller,
         children: [
           HomeScreen(),

@@ -29,7 +29,7 @@ final dioProvider = Provider((ref) {
   //   ),
   // );
 
-  dio.interceptors.add;
+  dio.interceptors.add(CustomInterceptor());
 
   return dio;
 });
