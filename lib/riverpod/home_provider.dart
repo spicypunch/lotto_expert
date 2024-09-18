@@ -103,6 +103,7 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
 
   Future<void> getAllLottoData() async {
     final allLottoData = await isarRepository.getAllLottoData();
+    print('home provide $allLottoData');
     state = AsyncValue.data(LottoNumberState(listLottoModel: allLottoData));
   }
 }

@@ -16,7 +16,8 @@ class LottoModel {
   String? numMapJson;
 
   void setNumMap(Map<int, int> map) {
-    numMapJson = jsonEncode(map);
+    Map<String, int> stringKeyMap = map.map((key, value) => MapEntry(key.toString(), value));
+    numMapJson = jsonEncode(stringKeyMap);
   }
 
   Map<int, int>? getNumMap() {
