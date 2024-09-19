@@ -17,7 +17,8 @@ class IsarRepository {
     this.isar,
   );
 
-  Future<void> saveLottoData(String title, List<int> sortedNum, Map<int, int> numMap) async {
+  Future<void> saveLottoData(
+      String title, List<int> sortedNum, Map<int, int> numMap) async {
     final lottoData = LottoModel()
       ..title = title
       ..sortedNum = sortedNum;
@@ -30,5 +31,11 @@ class IsarRepository {
 
   Future<List<LottoModel>> getAllLottoData() async {
     return await isar.lottoModels.where().findAll();
+  }
+
+  Future<void> deleteItem(int id) async {
+    await isar.writeTxn(() async {
+      await isar.lottoModels.delete(id);
+    });
   }
 }

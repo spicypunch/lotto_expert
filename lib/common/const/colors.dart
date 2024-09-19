@@ -10,3 +10,5 @@ const BUTTON_COLOR = Color(0xFFF2CC0D);
 const PRIMARY_BLACK = Color(0xFF1C1A0D);
 // 텍스트 필드 테두리 색상
 const TEXT_FEILD_BG_COLOR = Color(0xFFF5F2E8);
+
+const GRAY = Color(0xFF969696);

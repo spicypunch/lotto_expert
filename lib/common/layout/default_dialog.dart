@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../const/colors.dart';
+import 'default_button.dart';
+
 class DefaultDialog extends StatelessWidget {
   final String title;
   final List<int> sortedNum;
@@ -48,12 +51,14 @@ class DefaultDialog extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             if (onTabButton != null)
-              ElevatedButton(
-                onPressed: () {
+              DefaultButton(
+                title: '정보 저장',
+                onTap: () {
                   onTabButton!();
                   Navigator.of(context).pop();
                 },
-                child: const Text('정보 저장'),
+                backgroundColor: BUTTON_COLOR,
+                foregroundColor: PRIMARY_BLACK,
               ),
           ],
         ),

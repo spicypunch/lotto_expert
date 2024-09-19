@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotto_expert/common/const/colors.dart';
 import 'package:lotto_expert/common/layout/default_layout.dart';
 
+import '../common/layout/default_button.dart';
 import '../common/layout/default_dialog.dart';
 import '../riverpod/home_provider.dart';
 
@@ -42,9 +43,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       controller: _startNoController,
                       decoration: const InputDecoration(
                         labelText: '로또 회차 시작',
+                        labelStyle: TextStyle(color: PRIMARY_BLACK),
                         border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: PRIMARY_BLACK),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
+                      cursorColor: PRIMARY_BLACK,
                     ),
                   ),
                   const SizedBox(
@@ -55,16 +61,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       controller: _endNoController,
                       decoration: const InputDecoration(
                         labelText: '로또 회차 끝',
+                        labelStyle: TextStyle(color: PRIMARY_BLACK),
                         border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: PRIMARY_BLACK),
+                        ),
+                        focusColor: PRIMARY_BLACK,
                       ),
                       keyboardType: TextInputType.number,
+                      cursorColor: PRIMARY_BLACK,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
+              DefaultButton(
+                title: '조회',
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+
+                  if(_startNoController.text.isEmpty || _endNoController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('시작 번호와 끝 번호를 모두 입력해주세요.'),
+                      ),
+                    );
+                    return;
+                  }
                   final startNo = int.tryParse(_startNoController.text) ?? 0;
                   final endNo = int.tryParse(_endNoController.text) ?? 0;
 
@@ -82,11 +105,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     );
                   }
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: BUTTON_COLOR,
-                  foregroundColor: PRIMARY_BLACK,
-                ),
-                child: const Text('조회'),
+                backgroundColor: BUTTON_COLOR,
+                foregroundColor: PRIMARY_BLACK,
               ),
               const SizedBox(
                 height: 16.0,
@@ -125,7 +145,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 },
                 error: (err, stack) => Text('Error: $err'),
                 loading: () => const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: GRAY,),
                 ),
               ),
             ],

@@ -21,4 +21,9 @@ class RecordProvider extends StateNotifier<List<LottoModel>> {
     final allLottoData = await isarRepository.getAllLottoData();
     state = allLottoData;
   }
+
+  Future<void> deleteItem(int id) async {
+    await isarRepository.deleteItem(id);
+  }
+
 }

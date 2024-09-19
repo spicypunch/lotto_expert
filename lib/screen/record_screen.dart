@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lotto_expert/common/layout/default_alert_dialog.dart';
 import 'package:lotto_expert/common/layout/default_dialog.dart';
 import 'package:lotto_expert/common/layout/default_layout.dart';
 
@@ -35,6 +36,21 @@ class RecordScreen extends ConsumerWidget {
                             title: state[index].title!,
                             sortedNum: state[index].sortedNum!,
                             numMap: numMap!,
+                          );
+                        },
+                      );
+                    },
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return DefaultAlertDialog(
+                            title: '해당 기록을 삭제하시겠습니까?',
+                            onTabConfirm: () {
+                              ref
+                                  .read(recordProvider.notifier)
+                                  .deleteItem(state[index].id);
+                            },
                           );
                         },
                       );
