@@ -4,13 +4,13 @@ class DefaultDialog extends StatelessWidget {
   final String title;
   final List<int> sortedNum;
   final Map<int, int> numMap;
-  final Function() onTabButton;
+  final Function()? onTabButton;
 
   const DefaultDialog({
     required this.title,
     required this.sortedNum,
     required this.numMap,
-    required this.onTabButton,
+    this.onTabButton,
     super.key,
   });
 
@@ -47,13 +47,14 @@ class DefaultDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                onTabButton();
-                Navigator.of(context).pop();
-              },
-              child: const Text('정보 저장'),
-            ),
+            if (onTabButton != null)
+              ElevatedButton(
+                onPressed: () {
+                  onTabButton!();
+                  Navigator.of(context).pop();
+                },
+                child: const Text('정보 저장'),
+              ),
           ],
         ),
       ),

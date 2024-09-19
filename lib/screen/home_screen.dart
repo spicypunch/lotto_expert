@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotto_expert/common/const/colors.dart';
+import 'package:lotto_expert/common/layout/default_layout.dart';
 
 import '../common/layout/default_dialog.dart';
 import '../riverpod/home_provider.dart';
@@ -15,6 +16,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _startNoController = TextEditingController();
   final TextEditingController _endNoController = TextEditingController();
+  bool _showDialog = false;
 
   @override
   void dispose() {
@@ -26,10 +28,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(homeProvider);
-
-    return Scaffold(
-      backgroundColor: PRIMARY_COLOR,
-      body: Center(
+    return DefaultLayout(
+      child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
@@ -73,6 +73,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           startNo,
                           endNo,
                         );
+                    _showDialog = false;
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -92,42 +93,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               state.when(
                 data: (lottoState) {
-                  print(lottoState.listLottoModel.toString());
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (lottoState.frequencyNumberMap != null &&
-                        lottoState.frequencyNumberMap!.isNotEmpty) {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return DefaultDialog(
-                            title: lottoState.dialogTitle!,
-                            sortedNum: lottoState.sortedNumbers!,
-                            numMap: lottoState.frequencyNumberMap!,
-                            onTabButton: () {
-                              ref.read(homeProvider.notifier).saveLottoNumber(
-                                    lottoState.dialogTitle!,
-                                    lottoState.sortedNumbers!,
-                                    lottoState.frequencyNumberMap!,
-                                  );
-                            },
-                          );
-                        },
-                      );
-                    }
-                  });
-                  // UI에 별도의 내용은 표시하지 않음
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) {
+                      if (!_showDialog &&
+                          lottoState.frequencyNumberMap != null &&
+                          lottoState.frequencyNumberMap!.isNotEmpty) {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return DefaultDialog(
+                              title: lottoState.dialogTitle!,
+                              sortedNum: lottoState.sortedNumbers!,
+                              numMap: lottoState.frequencyNumberMap!,
+                              onTabButton: () {
+                                ref
+                                    .read(homeProvider.notifier)
+                                    .saveLottoNumber(
+                                      lottoState.dialogTitle!,
+                                      lottoState.sortedNumbers!,
+                                      lottoState.frequencyNumberMap!,
+                                    );
+                              },
+                            );
+                          },
+                        );
+                      }
+                      _showDialog = true;
+                    },
+                  );
                   return const SizedBox.shrink();
                 },
                 error: (err, stack) => Text('Error: $err'),
                 loading: () => const Center(
-                  child: CircularProgressIndicator(), // 로딩 중일 때 표시
+                  child: CircularProgressIndicator(),
                 ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(homeProvider.notifier).getAllLottoData();
-                },
-                child: const Text('정보 저장'),
               ),
             ],
           ),

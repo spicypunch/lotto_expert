@@ -11,13 +11,11 @@ class LottoNumberState {
   Map<int, int>? frequencyNumberMap;
   List<int>? sortedNumbers;
   String? dialogTitle;
-  List<LottoModel>? listLottoModel;
 
   LottoNumberState({
     this.frequencyNumberMap,
     this.sortedNumbers,
     this.dialogTitle,
-    this.listLottoModel,
   });
 }
 
@@ -47,14 +45,12 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
     state = const AsyncValue.loading();
     try {
       Map<int, int> numberFrequency = {};
-      // List<int> allNumbers = [];
 
       for (int i = startNo; i <= endNo; i++) {
         final response = await lottoRepository.getLottoNumber(drwNo: i);
         final jsonData = jsonDecode(response);
         final lottoModel = LottoNumberResponse.fromJson(jsonData);
 
-        // drwtNo1부터 drwtNo6까지 추출
         final List<int> lottoNumbers = [
           lottoModel.drwtNo1,
           lottoModel.drwtNo2,
@@ -64,10 +60,6 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
           lottoModel.drwtNo6,
         ];
 
-        // 번호를 리스트에 추가
-        // allNumbers.addAll(lottoNumbers);
-
-        // 각 번호의 등장 횟수를 계산
         for (var number in lottoNumbers) {
           numberFrequency[number] = (numberFrequency[number] ?? 0) + 1;
         }
@@ -99,11 +91,5 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
       sortedNum,
       numMap,
     );
-  }
-
-  Future<void> getAllLottoData() async {
-    final allLottoData = await isarRepository.getAllLottoData();
-    print('home provide $allLottoData');
-    state = AsyncValue.data(LottoNumberState(listLottoModel: allLottoData));
   }
 }

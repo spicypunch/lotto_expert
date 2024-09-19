@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lotto_expert/screen/record_screen.dart';
 
 import '../common/const/colors.dart';
 import '../common/layout/default_layout.dart';
@@ -13,7 +14,6 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen>
     with SingleTickerProviderStateMixin {
-
   late TabController controller;
   int index = 0;
 
@@ -39,7 +39,6 @@ class _RootScreenState extends State<RootScreen>
   @override
   Widget build(BuildContext context) {
     return DefaultLayout(
-      title: '로또 당첨 번호 통계',
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: PRIMARY_COLOR,
         selectedItemColor: PRIMARY_BLACK,
@@ -67,9 +66,7 @@ class _RootScreenState extends State<RootScreen>
         controller: controller,
         children: [
           HomeScreen(),
-          Container(
-            child: Text('김종민'),
-          ),
+          RecordScreen(),
         ],
       ),
     );
