@@ -25,11 +25,11 @@ class IsarInitializer extends ConsumerWidget {
           child: CircularProgressIndicator(),
         ),
       ),
-      error: (error, stackTrace) => Scaffold(
+      error: (error, stackTrace) => const Scaffold(
         body: Center(
-          child: Text('Error: $error'),
-        ),
-      ),
+        child: CircularProgressIndicator(),
+    ),
+    ),
       data: (isar) => RootScreen(),
     );
   }
