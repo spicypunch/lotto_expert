@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lotto_expert/model/lotto_model.dart';
 import 'package:lotto_expert/model/lotto_number_response.dart';
 import 'package:lotto_expert/repository/lotto_repository.dart';
 
@@ -38,20 +37,19 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
     required this.isarRepository,
   }) : super(AsyncValue.data(LottoNumberState()));
 
-  Future<void> getLottoNumber(
-    int startNo,
-    int endNo,
-  ) async {
+  Future<void> getLottoNumber(int startNo, int endNo) async {
     state = const AsyncValue.loading();
     try {
       Map<int, int> numberFrequency = {};
 
-      for (int i = startNo; i <= endNo; i++) {
-        final response = await lottoRepository.getLottoNumber(drwNo: i);
+      // 각 회차 요청을 병렬로 실행
+      final futures = List.generate(endNo - startNo + 1, (index) async {
+        final drawNumber = startNo + index;
+        final response = await lottoRepository.getLottoNumber(drwNo: drawNumber);
         final jsonData = jsonDecode(response);
         final lottoModel = LottoNumberResponse.fromJson(jsonData);
 
-        final List<int> lottoNumbers = [
+        return [
           lottoModel.drwtNo1,
           lottoModel.drwtNo2,
           lottoModel.drwtNo3,
@@ -59,7 +57,13 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
           lottoModel.drwtNo5,
           lottoModel.drwtNo6,
         ];
+      });
 
+      // 모든 회차의 요청이 완료될 때까지 기다림
+      final results = await Future.wait(futures);
+
+      // 모든 회차의 로또 번호를 빈도에 따라 기록
+      for (var lottoNumbers in results) {
         for (var number in lottoNumbers) {
           numberFrequency[number] = (numberFrequency[number] ?? 0) + 1;
         }

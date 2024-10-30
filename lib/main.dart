@@ -17,8 +17,7 @@ void main() async {
 class IsarInitializer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isarAsyncValue =ref.watch(isarProvider);
-
+    final isarAsyncValue = ref.watch(isarProvider);
     return isarAsyncValue.when(
       loading: () => const Scaffold(
         body: Center(
@@ -27,11 +26,10 @@ class IsarInitializer extends ConsumerWidget {
       ),
       error: (error, stackTrace) => const Scaffold(
         body: Center(
-        child: CircularProgressIndicator(),
-    ),
-    ),
+          child: CircularProgressIndicator(),
+        ),
+      ),
       data: (isar) => RootScreen(),
     );
   }
-
 }

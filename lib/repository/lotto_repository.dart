@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotto_expert/common/dio/dio.dart';
-import 'package:lotto_expert/model/lotto_number_response.dart';
 import 'package:retrofit/http.dart';
 
 part 'lotto_repository.g.dart';
