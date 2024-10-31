@@ -41,31 +41,38 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
     state = const AsyncValue.loading();
     try {
       Map<int, int> numberFrequency = {};
+      int batchSize = 5; // 한 번에 처리할 최대 요청 수
 
-      // 각 회차 요청을 병렬로 실행
-      final futures = List.generate(endNo - startNo + 1, (index) async {
-        final drawNumber = startNo + index;
-        final response = await lottoRepository.getLottoNumber(drwNo: drawNumber);
-        final jsonData = jsonDecode(response);
-        final lottoModel = LottoNumberResponse.fromJson(jsonData);
+      // 각 회차 요청을 배치별로 병렬 실행
+      for (int i = startNo; i <= endNo; i += batchSize) {
+        // batchSize 만큼의 요청을 생성
+        final batchFutures = List.generate(
+          (i + batchSize > endNo ? endNo - i + 1 : batchSize),
+              (index) {
+            final drawNumber = i + index;
+            return lottoRepository.getLottoNumber(drwNo: drawNumber).then((response) {
+              final jsonData = jsonDecode(response);
+              final lottoModel = LottoNumberResponse.fromJson(jsonData);
+              return [
+                lottoModel.drwtNo1,
+                lottoModel.drwtNo2,
+                lottoModel.drwtNo3,
+                lottoModel.drwtNo4,
+                lottoModel.drwtNo5,
+                lottoModel.drwtNo6,
+              ];
+            });
+          },
+        );
 
-        return [
-          lottoModel.drwtNo1,
-          lottoModel.drwtNo2,
-          lottoModel.drwtNo3,
-          lottoModel.drwtNo4,
-          lottoModel.drwtNo5,
-          lottoModel.drwtNo6,
-        ];
-      });
+        // 현재 배치의 모든 요청을 기다림
+        final results = await Future.wait(batchFutures);
 
-      // 모든 회차의 요청이 완료될 때까지 기다림
-      final results = await Future.wait(futures);
-
-      // 모든 회차의 로또 번호를 빈도에 따라 기록
-      for (var lottoNumbers in results) {
-        for (var number in lottoNumbers) {
-          numberFrequency[number] = (numberFrequency[number] ?? 0) + 1;
+        // 모든 회차의 로또 번호를 빈도에 따라 기록
+        for (var lottoNumbers in results) {
+          for (var number in lottoNumbers) {
+            numberFrequency[number] = (numberFrequency[number] ?? 0) + 1;
+          }
         }
       }
 
@@ -84,6 +91,50 @@ class HomeProvider extends StateNotifier<AsyncValue<LottoNumberState>> {
       state = AsyncValue.error(error, stackTrace);
     }
   }
+
+  // Future<void> getLottoNumber(
+  //     int startNo,
+  //     int endNo,
+  //     ) async {
+  //   state = const AsyncValue.loading();
+  //   try {
+  //     Map<int, int> numberFrequency = {};
+  //
+  //     for (int i = startNo; i <= endNo; i++) {
+  //       final response = await lottoRepository.getLottoNumber(drwNo: i);
+  //       final jsonData = jsonDecode(response);
+  //       final lottoModel = LottoNumberResponse.fromJson(jsonData);
+  //
+  //       final List<int> lottoNumbers = [
+  //         lottoModel.drwtNo1,
+  //         lottoModel.drwtNo2,
+  //         lottoModel.drwtNo3,
+  //         lottoModel.drwtNo4,
+  //         lottoModel.drwtNo5,
+  //         lottoModel.drwtNo6,
+  //       ];
+  //
+  //       for (var number in lottoNumbers) {
+  //         numberFrequency[number] = (numberFrequency[number] ?? 0) + 1;
+  //       }
+  //     }
+  //
+  //     // 번호를 빈도 순으로 정렬
+  //     List<int> sortedNumbers = numberFrequency.keys.toList()
+  //       ..sort((a, b) => numberFrequency[b]!.compareTo(numberFrequency[a]!));
+  //
+  //     state = AsyncValue.data(
+  //       LottoNumberState(
+  //         frequencyNumberMap: numberFrequency,
+  //         sortedNumbers: sortedNumbers,
+  //         dialogTitle: '$startNo회차 ~ $endNo회차',
+  //       ),
+  //     );
+  //   } catch (error, stackTrace) {
+  //     state = AsyncValue.error(error, stackTrace);
+  //   }
+  // }
+
 
   Future<void> saveLottoNumber(
     String title,
