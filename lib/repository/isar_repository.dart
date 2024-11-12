@@ -1,14 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 
 import '../model/lotto_model.dart';
-import '../riverpod/isar_provider.dart';
-
-final isarRepositoryProvider = Provider<IsarRepository>((ref) {
-  final isar = ref.watch(isarProvider).value;
-  if (isar == null) throw Exception('Isar is not initialized');
-  return IsarRepository(isar);
-});
 
 class IsarRepository {
   final Isar isar;

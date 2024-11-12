@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lotto_expert/screen/record_screen.dart';
-
+import '../bloc/home_bloc.dart';
 import '../common/const/colors.dart';
 import '../common/layout/default_layout.dart';
+import '../repository/isar_repository.dart';
+import '../repository/lotto_repository.dart';
 import 'home_screen.dart';
 
 class RootScreen extends StatefulWidget {
@@ -38,36 +41,46 @@ class _RootScreenState extends State<RootScreen>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultLayout(
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: PRIMARY_COLOR,
-        selectedItemColor: PRIMARY_BLACK,
-        unselectedItemColor: SECONDARY_COLOR,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        type: BottomNavigationBarType.fixed,
-        onTap: (int index) {
-          controller.animateTo(index);
-        },
-        currentIndex: index,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            label: '검색',
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => HomeBloc(
+            lottoRepository: context.read<LottoRepository>(),
+            isarRepository: context.read<IsarRepository>(),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history_outlined),
-            label: '기록',
-          ),
-        ],
-      ),
-      child: TabBarView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: controller,
-        children: [
-          HomeScreen(),
-          RecordScreen(),
-        ],
+        ),
+      ],
+      child: DefaultLayout(
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: PRIMARY_COLOR,
+          selectedItemColor: PRIMARY_BLACK,
+          unselectedItemColor: SECONDARY_COLOR,
+          selectedFontSize: 10,
+          unselectedFontSize: 10,
+          type: BottomNavigationBarType.fixed,
+          onTap: (int index) {
+            controller.animateTo(index);
+          },
+          currentIndex: index,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search_outlined),
+              label: '검색',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.history_outlined),
+              label: '기록',
+            ),
+          ],
+        ),
+        child: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: controller,
+          children: [
+            HomeScreen(),
+            RecordScreen(),
+          ],
+        ),
       ),
     );
   }
