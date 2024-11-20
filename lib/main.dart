@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider(create: (_) => lottoRepository), // LottoRepository 주입
+        RepositoryProvider(create: (_) => lottoRepository),
         RepositoryProvider(create: (_) => IsarRepository(isar)),
       ],
       child: MultiBlocProvider(

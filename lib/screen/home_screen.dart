@@ -70,19 +70,21 @@ class HomeScreen extends StatelessWidget {
                     final startNo = int.tryParse(_startNoController.text) ?? 0;
                     final endNo = int.tryParse(_endNoController.text) ?? 0;
 
-                    if(startNo == 0 || endNo == 0) {
+                    if (startNo == 0 || endNo == 0) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('시작 번호와 끝 번호를 모두 입력해주세요.'),
-                        ),
+                            content: Text('시작 번호와 끝 번호를 모두 입력해주세요.')),
                       );
                       return;
                     }
                     if (startNo <= endNo) {
-                      context.read<HomeBloc>().add(FetchLottoNumbers(startNo, endNo));
+                      context
+                          .read<HomeBloc>()
+                          .add(FetchLottoNumbers(startNo, endNo));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('시작 번호는 끝 번호보다 작거나 같아야 합니다.')),
+                        const SnackBar(
+                            content: Text('시작 번호는 끝 번호보다 작거나 같아야 합니다.')),
                       );
                     }
                   },
@@ -107,10 +109,10 @@ class HomeScreen extends StatelessWidget {
                               numMap: state.frequencyNumberMap!,
                               onTabButton: () {
                                 context.read<HomeBloc>().add(SaveLottoNumbers(
-                                  state.dialogTitle!,
-                                  state.sortedNumbers!,
-                                  state.frequencyNumberMap!,
-                                ));
+                                      state.dialogTitle!,
+                                      state.sortedNumbers!,
+                                      state.frequencyNumberMap!,
+                                    ));
                               },
                             );
                           },

@@ -60,14 +60,16 @@ class HomeBloc extends Bloc<HomeEvent, LottoNumberState> {
       List<int> sortedNumbers = numberFrequency.keys.toList()
         ..sort((a, b) => numberFrequency[b]!.compareTo(numberFrequency[a]!));
 
-      emit(state.copyWith(
-        frequencyNumberMap: numberFrequency,
-        sortedNumbers: sortedNumbers,
-        dialogTitle: '${event.startNo}회차 ~ ${event.endNo}회차',
-        isLoading: false,
-      ));
+      // emit(
+      //   state.copyWith(
+      //     frequencyNumberMap: numberFrequency,
+      //     sortedNumbers: sortedNumbers,
+      //     dialogTitle: '${event.startNo}회차 ~ ${event.endNo}회차',
+      //     isLoading: false,
+      //   ),
+      // );
     } catch (error) {
-      print('에러');
+      print('Err: GetLottoNumberError');
       emit(state.copyWith(
         isLoading: false,
         errorMessage: error.toString(),
